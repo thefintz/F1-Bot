@@ -1,0 +1,27 @@
+service: f1-bot
+
+provider:
+  name: aws
+  runtime: python3.10
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-2'}
+  
+plugins: 
+  - serverless-python-requirements
+  
+package: 
+  individually: true
+  
+functions:
+  index:
+    name: f1-bot
+    handler: lambda.handler
+    description: F1 Bot Lambda
+    memorySize: 128
+    timeout: 10
+    package:
+      exclude:
+        - "!node_modules/**"
+        - "yarn.lock"
+        - "!package-lock.json"
+        - "!package.json"
