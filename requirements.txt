@@ -1,1 +1,5 @@
-PyNaCl
+flask
+mangum
+asgiref
+discord-interactions
+python-dotenv
