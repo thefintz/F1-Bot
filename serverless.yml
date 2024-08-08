@@ -15,7 +15,7 @@ package:
 functions:
   index:
     name: f1-bot
-    handler: lambda.handler
+    handler: src/main.handler
     description: F1 Bot Lambda
     memorySize: 128
     timeout: 10
