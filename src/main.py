@@ -12,7 +12,7 @@ DISCORD_PUBLIC_KEY = os.getenv("DISCORD_PUBLIC_KEY")
 
 app = Flask(__name__)
 asgi_app = WsgiToAsgi(app)
-handler = Mangum(asgi_app)
+handler = Mangum(asgi_app, lifespan="off")
 
 @app.route("/", methods=["POST"])
 async def interactions():
