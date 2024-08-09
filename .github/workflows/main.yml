@@ -46,9 +46,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - run: npm ci
-      - run: npm install -g serverless
       - name: Install Plugin and Deploy (Serverless)
-        uses: serverless/github-action@v3
+        uses: serverless/github-action@v3.2
         with:
           args: -c "serverless plugin install --name serverless-python-requirements && serverless deploy"
           entrypoint: /bin/sh
