@@ -11,8 +11,6 @@ from discord_interactions import verify_key_decorator
 DISCORD_PUBLIC_KEY = os.getenv("DISCORD_PUBLIC_KEY")
 
 app = Flask(__name__)
-asgi_app = WsgiToAsgi(app)
-handler = Mangum(asgi_app, lifespan="off")
 
 @app.route("/", methods=["POST"])
 async def interactions():
@@ -49,6 +47,9 @@ def interact(raw_request):
     }
 
     return jsonify(response_data)
+
+asgi_app = WsgiToAsgi(app)
+handler = Mangum(asgi_app)
 
 if __name__ == "__main__":
     app.run(debug=True)
