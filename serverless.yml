@@ -5,15 +5,15 @@ provider:
   runtime: python3.10
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-2'}
-  
-plugins: 
+
+plugins:
   - serverless-python-requirements
-  
-package: 
+
+package:
   individually: true
-  
+
 functions:
-  index:
+  deploy:
     name: f1-bot
     handler: src/main.handler
     description: F1 Bot Lambda

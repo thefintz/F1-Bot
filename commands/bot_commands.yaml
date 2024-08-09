@@ -1,6 +1,9 @@
 - name: hello
   description: Say hello!
   
+- name: about
+  description: What am I?.
+  
 - name: song
   description: Show F1's favorite song.
 

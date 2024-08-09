@@ -1,39 +1,28 @@
 name: Deploy Lambda
 
-on: 
+on:
   push:
     branches:
       - main
-      
+
 jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
     env:
-      NODE_VERSION: 14.x # used for installing the serverless-python-requirements dependency from NPM
+      NODE_VERSION: 20.x # used for installing the serverless-python-requirements dependency from NPM
     strategy:
       matrix:
         python-version:
-          - 3.8 # with a build matrix, you can specify a list of python versions to deploy with
+          - 3.10 # with a build matrix, you can specify a list of python versions to deploy with
     steps:
-      # --------- use Python to install Python dependencies and run linter, tests, etc. ---------
-      - uses: actions/checkout@v2
+      # --------- use Python to install Python dependencies and run linter and publish commands ---------
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          # This path is specific to Ubuntu
-          path: ~/.cache/pip
-          # Look to see if there is a cache hit for the corresponding requirements file
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-            ${{ runner.os }}-
-      - name: Install dependencies
+      - name: Install dependencies to publish commands
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest
@@ -44,32 +33,25 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Publish commands
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          DISCORD_APPLICATION_ID: ${{ secrets.DISCORD_APPLICATION_ID }}
+        run: |
+          python commands/publish_commands.py
 
-      # --------- Use Node and NPM to install serverless-python-requirements ---------
+      # --------- Use Node and NPM to deploy with Serverless ---------
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
+      - run: npm ci
+      - name: Install Plugin and Deploy (Serverless)
+        uses: serverless/github-action@v3
         with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - name: Install Node dependencies (specifically, serverless-python-requirements)
-        run: npm install
-
-      - name: Serverless Deploy
-        uses: dhollerbach/github-action-serverless-with-python-requirements@master
+          args: -c "serverless plugin install --name serverless-python-requirements && serverless deploy"
+          entrypoint: /bin/sh
         env:
-          # SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-          # or if using AWS credentials directly
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          DISCORD_PUBLIC_KEY: ${{ secrets.DISCORD_PUBLIC_KEY }}
