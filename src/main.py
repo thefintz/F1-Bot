@@ -26,7 +26,6 @@ def interact(raw_request):
     if raw_request["type"] == 1:
         return jsonify({"type": 1})
 
-
     data = raw_request["data"]
     command_name = data["name"]
 
