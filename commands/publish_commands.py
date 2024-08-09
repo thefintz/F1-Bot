@@ -31,7 +31,7 @@ def publish_commands(file_path: str):
         print(f"Command {command_name} created: {response.status_code}")
 
 def main():
-    publish_commands("bot_commands.yaml")
+    publish_commands("commands/bot_commands.yaml")
 
 if __name__ == "__main__":
     main()
