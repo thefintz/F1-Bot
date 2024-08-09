@@ -13,7 +13,7 @@ package:
   individually: true
 
 functions:
-  deploy:
+  index:
     name: f1-bot
     handler: src/main.handler
     description: F1 Bot Lambda
