@@ -128,7 +128,7 @@ def interact(raw_request):
         #     """
         else:
             embed = {
-                "title": f"🏁 **Formula 1 - {schedule['name']} Grand Prix** 🏁"",
+                "title": f"🏁 **Formula 1 - {schedule['name']} Grand Prix** 🏁",
                 "description": "Grand Prix Schedule",
                 "color": 16711680,  # Cor em decimal (neste caso, vermelho)
                 "fields": [
