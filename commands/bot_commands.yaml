@@ -10,10 +10,17 @@
 - name: winner
   description: Who won the last F1 race?
   
-- name: echo
-  description: Echo message back to sender.
+- name: gp
+  description: Information about current season Grand Prix weekends.
   options:
-    - name: message
-      description: The message to echo back.
-      type: 3 # string
-      required: true
+    - name: location
+      description: Information about a specific Grand Prix.
+      type: 1 # subcommand
+      options:
+        - name: name
+          description: The name of the Grand Prix's location.
+          type: 3 # string
+          required: true
+    - name: next
+      description: Information about the next Grand Prix (not implemented yet).
+      type: 1 # subcommand

@@ -4,8 +4,8 @@ import yaml
 import os
 
 # Uncomment for local testing
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
 APPLICATION_ID: Final[str] = os.getenv('DISCORD_APPLICATION_ID')
@@ -31,7 +31,7 @@ def publish_commands(file_path: str):
         print(f"Command {command_name} created: {response.status_code}")
 
 def main():
-    publish_commands("commands/bot_commands.yaml")
+    publish_commands("bot_commands.yaml")
 
 if __name__ == "__main__":
     main()
