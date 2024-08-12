@@ -3,8 +3,12 @@
 ## About
 Discord bot for F1 fans.
 
-## How to run
-Create a `.env` file in the root directory with the following content:
-``` DISCORD_TOKEN='{your-bot-key}' ```
+## How to run locally
+Create two `.env` files in the directories with the following content:
+- ```/commands```:
+    - DISCORD_TOKEN
+    - DISCORD_APPLICATION_ID
+- ```/src```:
+    - DISCORD_PUBLIC_KEY
 
-Then run ``` main.py ```
+Then run ```src/main.py``` following the instructions in the code comments.
