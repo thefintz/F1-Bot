@@ -103,29 +103,6 @@ def interact(raw_request):
                     }
                 ]
             }
-        #     message_content = f"""
-        #     🏁 **Formula 1 - {schedule['name']} Grand Prix** 🏁
-        #     📍 **Location:** {schedule['location']}
-            
-        #     **Sessions:**
-        #     - **Practice 1:** {format_datetime(schedule['sessions']['fp1'])}
-        #     - **Sprint Qualifying:** {format_datetime(schedule['sessions']['sprintQualifying'])}
-        #     - **Sprint:** {format_datetime(schedule['sessions']['sprint'])}
-        #     - **Qualifying:** {format_datetime(schedule['sessions']['qualifying'])}
-        #     - **Race:** {format_datetime(schedule['sessions']['gp'])}
-        #     """
-        # else:
-        #     message_content = f"""
-        #     🏁 **Formula 1 - {schedule['name']} Grand Prix** 🏁\n
-        #     📍 **Location:** {schedule['location']}\n
-            
-        #     **Sessions:**\n
-        #     - **Practice 1:** {format_datetime(schedule['sessions']['fp1'])}\n
-        #     - **Practice 2:** {format_datetime(schedule['sessions']['fp2'])}\n
-        #     - **Practice 3:** {format_datetime(schedule['sessions']['fp3'])}\n
-        #     - **Qualifying:** {format_datetime(schedule['sessions']['qualifying'])}\n
-        #     - **Race:** {format_datetime(schedule['sessions']['gp'])}\n
-        #     """
         else:
             embed = {
                 "title": f"🏁 **Formula 1 - {schedule['name']} Grand Prix** 🏁",
@@ -175,7 +152,6 @@ def interact(raw_request):
                     "embeds": [embed]
                 }
             }
-            
             return jsonify(response_data)
         
     response_data = {
