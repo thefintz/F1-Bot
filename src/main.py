@@ -65,28 +65,30 @@ def interact(raw_request):
             
         schedule = get_gp_schedule("data/schedule", 2024, location)
         
-        message_content = f"""
-        🏁 **Formula 1 - Qatar Grand Prix** 🏁
-        📍 **Location:** {data['location']}, Qatar
-        
-        **Sessions:**
-        - **Practice 1:** {format_datetime(data['sessions']['fp1'])}
-        - **Sprint Qualifying:** {format_datetime(data['sessions']['sprintQualifying'])}
-        - **Sprint:** {format_datetime(data['sessions']['sprint'])}
-        - **Qualifying:** {format_datetime(data['sessions']['qualifying'])}
-        - **Race:** {format_datetime(data['sessions']['gp'])}
-        """ if 'sprint' in data['sessions'] else 
-        f"""
-        🏁 **Formula 1 - Las Vegas Grand Prix** 🏁
-        📍 **Location:** {data['location']}, Nevada, USA
-        
-        **Sessions:**
-        - **Practice 1:** {format_datetime(data['sessions']['fp1'])}
-        - **Practice 2:** {format_datetime(data['sessions']['fp2'])}
-        - **Practice 3:** {format_datetime(data['sessions']['fp3'])}
-        - **Qualifying:** {format_datetime(data['sessions']['qualifying'])}
-        - **Race:** {format_datetime(data['sessions']['gp'])}
-        """
+        if 'sprint' in data['sessions']:
+            message_content = f"""
+            🏁 **Formula 1 - Qatar Grand Prix** 🏁
+            📍 **Location:** {data['location']}, Qatar
+            
+            **Sessions:**
+            - **Practice 1:** {format_datetime(data['sessions']['fp1'])}
+            - **Sprint Qualifying:** {format_datetime(data['sessions']['sprintQualifying'])}
+            - **Sprint:** {format_datetime(data['sessions']['sprint'])}
+            - **Qualifying:** {format_datetime(data['sessions']['qualifying'])}
+            - **Race:** {format_datetime(data['sessions']['gp'])}
+            """
+        else:
+            message_content = """
+            🏁 **Formula 1 - Las Vegas Grand Prix** 🏁
+            📍 **Location:** {data['location']}, Nevada, USA
+            
+            **Sessions:**
+            - **Practice 1:** {format_datetime(data['sessions']['fp1'])}
+            - **Practice 2:** {format_datetime(data['sessions']['fp2'])}
+            - **Practice 3:** {format_datetime(data['sessions']['fp3'])}
+            - **Qualifying:** {format_datetime(data['sessions']['qualifying'])}
+            - **Race:** {format_datetime(data['sessions']['gp'])}
+            """
         
         if "error" in message_content:
             message_content = "Location name not found, try again with a valid Grand Prix location!"
