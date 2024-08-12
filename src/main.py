@@ -60,7 +60,7 @@ def interact(raw_request):
         
     response_data = {
         "type": 4,
-        "data": {"content": data}
+        "data": {"content": message_content}
     }
         
     return jsonify(response_data)
