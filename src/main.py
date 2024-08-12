@@ -3,7 +3,7 @@ from flask import Flask, jsonify, request
 from mangum import Mangum
 from asgiref.wsgi import WsgiToAsgi
 from discord_interactions import verify_key_decorator
-from data import get_gp_schedule
+import json
 
 # Uncomment for local testing
 # from dotenv import load_dotenv
@@ -20,6 +20,18 @@ async def interactions():
     print(f"Request: {request.json}")
     raw_request = request.json
     return interact(raw_request)
+
+def get_schedules(path, year):
+    with open(f"{path}/{year}.json", "r") as file:
+        return json.load(file)
+        
+def get_gp_schedule(path, year, name):
+    schedules = get_schedules(path, year)
+    
+    if name in schedules:
+        return schedules[name]
+    
+    return {"error": "No schedule found for this GP!"}
 
 # Comment decorator for local testing
 @verify_key_decorator(DISCORD_PUBLIC_KEY)
