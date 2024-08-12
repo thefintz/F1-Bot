@@ -22,5 +22,5 @@
           type: 3 # string
           required: true
     - name: next
-      description: Information about the next Grand Prix (not implemented yet).
+      description: Information about the next Grand Prix.
       type: 1 # subcommand

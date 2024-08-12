@@ -2,6 +2,7 @@ from typing import Final
 import requests
 import yaml
 import os
+import json
 
 # Uncomment for local testing
 # from dotenv import load_dotenv
@@ -16,7 +17,27 @@ def yaml_to_json(file_path: str):
         yaml_content = file.read()
 
     commands = yaml.safe_load(yaml_content)
+    commands = add_location_choices(commands)
 
+    return commands
+
+def get_schedules(path, year):
+    with open(f"{path}/{year}.json", "r") as file:
+        return json.load(file)
+
+def add_location_choices(commands: dict):
+    for command in commands:
+        if command["name"] == "gp":
+            gp = command
+            break
+    
+    schedules = get_schedules("data/schedule", 2024)
+    locations = list(schedules.keys())
+    locations = [{"name": location, "value": location} for location in locations]
+    
+    location_options = gp["options"][0]["options"][0]
+    location_options['choices'] = locations
+    
     return commands
 
 def publish_commands(file_path: str):
