@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 from mangum import Mangum
 from asgiref.wsgi import WsgiToAsgi
 from discord_interactions import verify_key_decorator
+from data import get_gp_schedule
 
 # Uncomment for local testing
 # from dotenv import load_dotenv
@@ -37,15 +38,17 @@ def interact(raw_request):
         message_content = "The Dutch National Anthem never leaves my playlist!"
     elif command_name == "winner":
         message_content = "I don't have this info right now, but it should be Max Verstappen..."
-    elif command_name == "echo":
-        original_message = data["options"][0]["value"]   
-        message_content = f"Echoing: {original_message}"
+    elif command_name == "gp" and data["options"][0]["name"]:
+        location = data["options"][0]["name"]
+        message_content = get_gp_schedule("../data/schedule", 2024, location)
+        if "error" in message_content:
+            message_content = "Location name not found, try again with a valid Grand Prix location!"
     else:
         message_content = "I don't understand this command, try again!"
         
     response_data = {
         "type": 4,
-        "data": {"content": message_content}
+        "data": {"content": data}
     }
         
     return jsonify(response_data)
