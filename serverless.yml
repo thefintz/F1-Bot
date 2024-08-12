@@ -19,6 +19,8 @@ functions:
     description: F1 Bot Lambda
     memorySize: 128
     timeout: 10
+    environment:
+      DISCORD_PUBLIC_KEY: ${env:DISCORD_PUBLIC_KEY}
     package:
       exclude:
         - "!node_modules/**"
