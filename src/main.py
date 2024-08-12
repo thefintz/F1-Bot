@@ -66,32 +66,117 @@ def interact(raw_request):
         schedule = get_gp_schedule("data/schedule", 2024, location)
         
         if 'sprint' in schedule['sessions']:
-            message_content = f"""
-            🏁 **Formula 1 - {schedule['name']} Grand Prix** 🏁
-            📍 **Location:** {schedule['location']}
+            embed = {
+                "title": f'🏁 **Formula 1 - {schedule['name']} Grand Prix** 🏁',
+                "description": "Grand Prix Schedule",
+                "color": 16711680,  # Cor em decimal (neste caso, vermelho)
+                "fields": [
+                    {
+                        "name": "📍 Location",
+                        "value": schedule['location'],
+                        "inline": False
+                    },
+                    {
+                        "name": "Practice 1",
+                        "value": format_datetime(schedule['sessions']['fp1']),
+                        "inline": False
+                    },
+                    {
+                        "name": "Sprint Qualifying",
+                        "value": format_datetime(schedule['sessions']['sprintQualifying']),
+                        "inline": False
+                    },
+                    {
+                        "name": "Sprint",
+                        "value": format_datetime(schedule['sessions']['sprint']),
+                        "inline": False
+                    },
+                    {
+                        "name": "Qualifying",
+                        "value": format_datetime(schedule['sessions']['qualifying']),
+                        "inline": False
+                    },
+                    {
+                        "name": "Race",
+                        "value": format_datetime(schedule['sessions']['gp']),
+                        "inline": False
+                    }
+                ]
+            }
+        #     message_content = f"""
+        #     🏁 **Formula 1 - {schedule['name']} Grand Prix** 🏁
+        #     📍 **Location:** {schedule['location']}
             
-            **Sessions:**
-            - **Practice 1:** {format_datetime(schedule['sessions']['fp1'])}
-            - **Sprint Qualifying:** {format_datetime(schedule['sessions']['sprintQualifying'])}
-            - **Sprint:** {format_datetime(schedule['sessions']['sprint'])}
-            - **Qualifying:** {format_datetime(schedule['sessions']['qualifying'])}
-            - **Race:** {format_datetime(schedule['sessions']['gp'])}
-            """
+        #     **Sessions:**
+        #     - **Practice 1:** {format_datetime(schedule['sessions']['fp1'])}
+        #     - **Sprint Qualifying:** {format_datetime(schedule['sessions']['sprintQualifying'])}
+        #     - **Sprint:** {format_datetime(schedule['sessions']['sprint'])}
+        #     - **Qualifying:** {format_datetime(schedule['sessions']['qualifying'])}
+        #     - **Race:** {format_datetime(schedule['sessions']['gp'])}
+        #     """
+        # else:
+        #     message_content = f"""
+        #     🏁 **Formula 1 - {schedule['name']} Grand Prix** 🏁\n
+        #     📍 **Location:** {schedule['location']}\n
+            
+        #     **Sessions:**\n
+        #     - **Practice 1:** {format_datetime(schedule['sessions']['fp1'])}\n
+        #     - **Practice 2:** {format_datetime(schedule['sessions']['fp2'])}\n
+        #     - **Practice 3:** {format_datetime(schedule['sessions']['fp3'])}\n
+        #     - **Qualifying:** {format_datetime(schedule['sessions']['qualifying'])}\n
+        #     - **Race:** {format_datetime(schedule['sessions']['gp'])}\n
+        #     """
         else:
-            message_content = f"""
-            🏁 **Formula 1 - {schedule['name']} Grand Prix** 🏁\n
-            📍 **Location:** {schedule['location']}\n
-            
-            **Sessions:**\n
-            - **Practice 1:** {format_datetime(schedule['sessions']['fp1'])}\n
-            - **Practice 2:** {format_datetime(schedule['sessions']['fp2'])}\n
-            - **Practice 3:** {format_datetime(schedule['sessions']['fp3'])}\n
-            - **Qualifying:** {format_datetime(schedule['sessions']['qualifying'])}\n
-            - **Race:** {format_datetime(schedule['sessions']['gp'])}\n
-            """
+            embed = {
+                "title": f'🏁 **Formula 1 - {schedule['name']} Grand Prix** 🏁',
+                "description": "Grand Prix Schedule",
+                "color": 16711680,  # Cor em decimal (neste caso, vermelho)
+                "fields": [
+                    {
+                        "name": "📍 Location",
+                        "value": schedule['location'],
+                        "inline": False
+                    },
+                    {
+                        "name": "Practice 1",
+                        "value": format_datetime(schedule['sessions']['fp1']),
+                        "inline": False
+                    },
+                    {
+                        "name": "Practice 2",
+                        "value": format_datetime(schedule['sessions']['fp2']),
+                        "inline": False
+                    },
+                    {
+                        "name": "Practice 3",
+                        "value": format_datetime(schedule['sessions']['fp3']),
+                        "inline": False
+                    },
+                    {
+                        "name": "Qualifying",
+                        "value": format_datetime(schedule['sessions']['qualifying']),
+                        "inline": False
+                    },
+                    {
+                        "name": "Race",
+                        "value": format_datetime(schedule['sessions']['gp']),
+                        "inline": False
+                    }
+                ]
+            }
         
         if "error" in message_content:
             message_content = "Location name not found, try again with a valid Grand Prix location!"
+        else:
+            response_data = {
+                "type": 4,
+                "data": {
+                    "content": "Here is the schedule for the requested Grand Prix:",
+                    "embeds": [embed]
+                }
+            }
+            
+            return jsonify(response_data)
         
     response_data = {
         "type": 4,
