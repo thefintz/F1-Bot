@@ -3,10 +3,15 @@ import requests
 import yaml
 import os
 import json
+import datetime
 
 # Uncomment for local testing
 # from dotenv import load_dotenv
 # load_dotenv()
+
+# Change for local testing
+# SCHEDULE_PATH = "../data/schedule"
+SCHEDULE_PATH = "data/schedule"
 
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
 APPLICATION_ID: Final[str] = os.getenv('DISCORD_APPLICATION_ID')
@@ -31,7 +36,7 @@ def add_location_choices(commands: dict):
             gp = command
             break
     
-    schedules = get_schedules("data/schedule", 2024)
+    schedules = get_schedules(SCHEDULE_PATH, datetime.date.today().year)
     locations = list(schedules.keys())
     locations = [{"name": location, "value": location} for location in locations]
     
