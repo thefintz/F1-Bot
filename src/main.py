@@ -68,8 +68,11 @@ def interact(raw_request):
         tag = data["options"][0]
         if tag["name"] == 'location':
             location = tag["options"][0]["value"]
+            content = "Here is the schedule for the requested Grand Prix weekend:"
         elif tag["name"] == 'next':
+            # da pra buscar isso uma vez só de tempos em tempos e guardar em algum lugar
             location = next_gp(SCHEDULE_PATH)[0]
+            content = "Here is the schedule for the next Grand Prix weekend:"
             
         embed = generate_schedule_embed(SCHEDULE_PATH, location)
         
@@ -79,7 +82,7 @@ def interact(raw_request):
             response_data = {
                 "type": 4,
                 "data": {
-                    "content": "Here is the schedule for the requested Grand Prix:",
+                    "content": content,
                     "embeds": [embed]
                 }
             }
