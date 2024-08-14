@@ -3,9 +3,6 @@ name: Grand Prix Reminder
 on:
   schedule:
     - cron: '0 12 * * 4' # every Thursday at 12:00 UTC
-  push:
-    branches:
-      - main
       
 jobs:
   reminder:
