@@ -5,12 +5,17 @@ from asgiref.wsgi import WsgiToAsgi
 from discord_interactions import verify_key_decorator
 import json
 import datetime
+import boto3
 
 # Uncomment for local testing
 # from dotenv import load_dotenv
 # load_dotenv()
 
 DISCORD_PUBLIC_KEY = os.getenv("DISCORD_PUBLIC_KEY")
+
+s3 = boto3.client("s3")
+BUCKET_NAME = 'f1-bot-channels'
+FILE_KEY = 'guild_channel.json'
 
 app = Flask(__name__)
 asgi_app = WsgiToAsgi(app)
@@ -38,11 +43,30 @@ def format_datetime(datetime_str):
     dt = datetime.datetime.fromisoformat(datetime_str.replace("Z", "+00:00"))
     return dt.strftime("%A, %d %B 2024, %H:%M UTC")
 
+def update_channels(channel):
+    channel_id = channel["id"]
+    guild_id = channel["guild_id"]
+    
+    # na real vou ter que pegar direto do s3 mesmo, não vou conseguir salvar os novos canais assim
+    # acho que o melhor seria guardar em uma cache global e só pegar o arquivo do s3 quando necessário, ou algo do tipo
+    try:
+        response = s3.get_object(Bucket=BUCKET_NAME, Key=FILE_KEY)
+        data = json.loads(response['Body'].read())
+        print(data)
+    except s3.exceptions.NoSuchKey:
+        data = {}
+        
+    data[guild_id] = channel_id
+    
+    s3.put_object(Bucket=BUCKET_NAME, Key=FILE_KEY, Body=json.dumps(data))
+
 # Comment decorator for local testing
 @verify_key_decorator(DISCORD_PUBLIC_KEY)
 def interact(raw_request):
     if raw_request["type"] == 1:
        return jsonify({"type": 1})
+       
+    update_channels(raw_request["channel"])
 
     data = raw_request["data"]
     command_name = data["name"]
@@ -61,7 +85,7 @@ def interact(raw_request):
         if tag["name"] == 'location':
             location = tag["options"][0]["value"]
         elif tag["name"] == 'next':
-            location = 'Belgium'
+            location = 'Netherlands'
             
         schedule = get_gp_schedule("data/schedule", 2024, location)
         

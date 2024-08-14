@@ -20,6 +20,8 @@ functions:
     memorySize: 128
     timeout: 10
     environment:
+      AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
       DISCORD_PUBLIC_KEY: ${env:DISCORD_PUBLIC_KEY}
     package:
       exclude:
