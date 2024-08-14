@@ -47,14 +47,9 @@ def update_channels(channel):
     channel_id = channel["id"]
     guild_id = channel["guild_id"]
     
-    # na real vou ter que pegar direto do s3 mesmo, não vou conseguir salvar os novos canais assim
-    # acho que o melhor seria guardar em uma cache global e só pegar o arquivo do s3 quando necessário, ou algo do tipo
-    try:
-        response = s3.get_object(Bucket=BUCKET_NAME, Key=FILE_KEY)
-        data = json.loads(response['Body'].read())
-        print(data)
-    except s3.exceptions.NoSuchKey:
-        data = {}
+    response = s3.get_object(Bucket=BUCKET_NAME, Key=FILE_KEY)
+    data = json.loads(response['Body'].read())
+    print(data)
         
     data[guild_id] = channel_id
     
@@ -87,7 +82,7 @@ def interact(raw_request):
         elif tag["name"] == 'next':
             location = 'Netherlands'
             
-        schedule = get_gp_schedule("data/schedule", 2024, location)
+        schedule = get_gp_schedule("data/schedule", datetime.date.today().year, location)
         
         if 'sprint' in schedule['sessions']:
             embed = {
