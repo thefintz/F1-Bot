@@ -6,7 +6,7 @@ from discord_interactions import verify_key_decorator
 import json
 import datetime
 import boto3
-from utils import generate_schedule_embed
+from src.utils import generate_schedule_embed
 
 # Uncomment for local testing
 # from dotenv import load_dotenv
