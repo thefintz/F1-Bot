@@ -6,7 +6,7 @@ from discord_interactions import verify_key_decorator
 import json
 import datetime
 import boto3
-from src.utils import generate_schedule_embed
+from src.utils import generate_schedule_embed, next_gp
 
 # Uncomment for local testing
 # from dotenv import load_dotenv
@@ -69,7 +69,7 @@ def interact(raw_request):
         if tag["name"] == 'location':
             location = tag["options"][0]["value"]
         elif tag["name"] == 'next':
-            location = 'Netherlands'
+            location = next_gp(SCHEDULE_PATH)[0]
             
         embed = generate_schedule_embed(SCHEDULE_PATH, location)
         

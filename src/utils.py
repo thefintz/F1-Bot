@@ -16,7 +16,28 @@ def get_gp_schedule(path, year, name):
 def format_datetime(datetime_str):
     dt = datetime.datetime.fromisoformat(datetime_str.replace("Z", "+00:00"))
     return dt.strftime("%A, %d %B 2024, %H:%M UTC")
+
+def next_gp(schedule_path):
+    today = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+    location = None
+    location_date = None
     
+    schedules = get_schedules(schedule_path, datetime.date.today().year)
+    
+    for gp_name, info in schedules.items():
+        date_str = info['sessions']['gp']
+        gp_date = datetime.datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+        
+        # Finding the next GP, closest date from today
+        if gp_date > today:
+            if location_date is None or gp_date < location_date:
+                location = gp_name
+                location_date = gp_date   
+    
+    is_race_week = (location_date - today).days <= 5
+    
+    return location, is_race_week
+
 def generate_schedule_embed(schedule_path, location):
     schedule = get_gp_schedule(schedule_path, datetime.date.today().year, location)
     
