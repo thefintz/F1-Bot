@@ -51,7 +51,7 @@ def update_channels(raw_request):
     elif raw_request["data"]["name"] == "unsubscribe":
         sub = False
     else:
-        sub = data.get(chat_id).get("sub")
+        sub = data.get(chat_id, {}).get("sub")
         
     data[chat_id] = {
         "channel_id": channel_id,
