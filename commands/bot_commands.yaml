@@ -19,10 +19,10 @@
 - name: standings
   description: Show championship standings.
   options:
-    - name: driver
+    - name: drivers
       description: Show driver standings.
       type: 1 # subcommand
-    - name: constructor
+    - name: constructors
       description: Show constructor standings.
       type: 1 # subcommand
   
