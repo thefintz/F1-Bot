@@ -1,4 +1,5 @@
 from typing import Final
+from time import sleep
 import requests
 import yaml
 import os
@@ -55,6 +56,9 @@ def publish_commands(file_path: str):
         command_name = command["name"]
         # No futuro adicionar tratamento de erro
         print(f"Command {command_name} created: {response.status_code}")
+
+        if response.headers['X-RateLimit-Remaining'] == '0':
+            sleep(float(response.headers['X-RateLimit-Reset-After']) + 1)
 
 def main():
     publish_commands("commands/bot_commands.yaml")
