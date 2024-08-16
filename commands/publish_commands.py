@@ -56,8 +56,10 @@ def publish_commands(file_path: str):
         command_name = command["name"]
         # No futuro adicionar tratamento de erro
         print(f"Command {command_name} created: {response.status_code}")
+        print(f"Rate limit remaining: {response.headers['X-RateLimit-Remaining']}")
 
         if response.headers['X-RateLimit-Remaining'] == '0':
+            print(f"Waiting for rate limit reset: {response.headers['X-RateLimit-Reset-After']} seconds")
             sleep(float(response.headers['X-RateLimit-Reset-After']) + 1)
 
 def main():

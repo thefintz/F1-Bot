@@ -3,15 +3,16 @@ import boto3
 import json
 import datetime
 import requests
+from time import sleep
 from utils import get_schedules, generate_schedule_embed
 
 # Uncomment for local testing
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
 # Change for local testing
-SCHEDULE_PATH = "../data/schedule"
-# SCHEDULE_PATH = "data/schedule"
+# SCHEDULE_PATH = "../data/schedule"
+SCHEDULE_PATH = "data/schedule"
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 
@@ -44,7 +45,6 @@ def next_gp():
 def send_next_gp_message():
     response = s3.get_object(Bucket=BUCKET_NAME, Key=FILE_KEY)
     guilds = json.loads(response['Body'].read())
-    print(f"Guilds: {guilds}")
     channels = [item['channel_id'] for item in guilds.values()]
     
     location, is_race_week = next_gp()
@@ -67,6 +67,11 @@ def send_next_gp_message():
         response = requests.post(url, headers=headers, data=json.dumps(message_data))
         print(f"Message sent to channel {channel_id} with status code {response.status_code}, {response.reason}")
         print(f"Response content: {response.content.decode()}")
+        print(f"Rate limit remaining: {response.headers['X-RateLimit-Remaining']}")
+        
+        if response.headers['X-RateLimit-Remaining'] == '0':
+            print(f"Waiting for rate limit reset: {response.headers['X-RateLimit-Reset-After']} seconds")
+            sleep(float(response.headers['X-RateLimit-Reset-After']) + 1)
 
 
 if __name__ == "__main__":

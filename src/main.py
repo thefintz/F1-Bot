@@ -82,6 +82,10 @@ def interact(raw_request):
         message_content = "The Dutch National Anthem never leaves my playlist!"
     elif command_name == "winner":
         message_content = "I don't have this info right now, but it should be Max Verstappen..."
+    elif command_name == "subscribe":
+        message_content = "You are now subscribed to the Grand Prix schedule updates!"
+    elif command_name == "unsubscribe":
+        message_content = "You are now unsubscribed from the Grand Prix schedule updates!"
     elif command_name == "gp":
         tag = data["options"][0]
         if tag["name"] == 'location':
