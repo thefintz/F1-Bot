@@ -45,7 +45,7 @@ def next_gp():
 def send_next_gp_message():
     response = s3.get_object(Bucket=BUCKET_NAME, Key=FILE_KEY)
     guilds = json.loads(response['Body'].read())
-    channels = [item['channel_id'] for item in guilds.values()]
+    channels = [item['channel_id'] for item in guilds.values() if item['sub'] is True]
     
     location, is_race_week = next_gp()
     embed = generate_schedule_embed(SCHEDULE_PATH, location)
