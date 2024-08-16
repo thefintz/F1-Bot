@@ -3,3 +3,4 @@ mangum
 asgiref
 discord-interactions
 boto3
+requests
