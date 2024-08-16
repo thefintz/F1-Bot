@@ -93,14 +93,14 @@ def interact(raw_request):
             embed = {
                 "title": "Driver Standings",
                 "url": f"https://www.formula1.com/en/results.html/{datetime.date.today()}/drivers.html",
-                "color": 0x00ff00
+                "color": 16711680
             }
         elif tag["name"] == 'constructors':
             content = "Here are the current constructor standings!"
             embed = {
                 "title": "Constructor Standings",
                 "url": f"https://www.formula1.com/en/results.html/{datetime.date.today()}/team.html",
-                "color": 0x00ff00
+                "color": 16711680
             }
             
         response_data = {
