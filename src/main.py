@@ -86,6 +86,32 @@ def interact(raw_request):
         message_content = "You are now subscribed to the Grand Prix schedule updates!"
     elif command_name == "unsubscribe":
         message_content = "You are now unsubscribed from the Grand Prix schedule updates!"
+    elif command_name == "standings":
+        tag = data["options"][0]
+        if tag["name"] == 'drivers':
+            content = "Here are the current driver standings!"
+            embed = {
+                "title": "Driver Standings",
+                "url": f"https://www.formula1.com/en/results.html/{datetime.date.today()}/drivers.html",
+                "color": 0x00ff00
+            }
+        elif tag["name"] == 'constructors':
+            content = "Here are the current constructor standings!"
+            embed = {
+                "title": "Constructor Standings",
+                "url": f"https://www.formula1.com/en/results.html/{datetime.date.today()}/team.html",
+                "color": 0x00ff00
+            }
+            
+        response_data = {
+            "type": 4,
+            "data": {
+                "content": content,
+                "embeds": [embed]
+            }
+        }
+        return jsonify(response_data)
+
     elif command_name == "gp":
         tag = data["options"][0]
         if tag["name"] == 'location':

@@ -16,6 +16,16 @@
 - name: unsubscribe
   description: Unsubscribe from weekly Grand Prix reminder.
   
+- name: standings
+  description: Show championship standings.
+  options:
+    - name: driver
+      description: Show driver standings.
+      type: 1 # subcommand
+    - name: constructor
+      description: Show constructor standings.
+      type: 1 # subcommand
+  
 - name: gp
   description: Information about current season Grand Prix weekends.
   options:

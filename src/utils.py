@@ -1,5 +1,6 @@
 import json
 import datetime
+import requests
 
 def get_schedules(path, year):
     with open(f"{path}/{year}.json", "r") as file:
@@ -12,6 +13,11 @@ def get_gp_schedule(path, year, name):
         return schedules[name]
     
     return {"error": "No schedule found for this GP!"}
+    
+def get_driver_standing():
+    response = requests.get("https://ergast.com/api/f1/current/driverStandings.json")
+    print(response.status_code)
+    print(response.json())
 
 def format_datetime(datetime_str):
     dt = datetime.datetime.fromisoformat(datetime_str.replace("Z", "+00:00"))
@@ -119,3 +125,4 @@ def generate_schedule_embed(schedule_path, location):
             }
         ]
     }
+get_driver_standing()
