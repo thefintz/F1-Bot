@@ -32,29 +32,47 @@ async def interactions():
     raw_request = request.json
     return interact(raw_request)
 
-def update_channels(channel):
+def update_channels(raw_request):
+    channel = raw_request["channel"]
     channel_id = channel["id"]
-    guild_id = channel["guild_id"]
+    chat_id = channel.get("guild_id")
+    channel_type = "guild"
+    if chat_id is None:
+        chat_id = channel["recipients"][0]["id"]
+        channel_type = "dm"
     
     response = s3.get_object(Bucket=BUCKET_NAME, Key=FILE_KEY)
     data = json.loads(response['Body'].read())
-    print(data)
+    
+    # Check if the command is subscribe or unsubscribe
+    # doing it here to avoid getting s3 object twice 
+    if raw_request["data"]["name"] == "subscribe":
+        sub = True
+    elif raw_request["data"]["name"] == "unsubscribe":
+        sub = False
+    else:
+        sub = data.get(chat_id).get("sub")
         
-    data[guild_id] = channel_id
+    data[chat_id] = {
+        "channel_id": channel_id,
+        "channel_type": channel_type,
+        "sub": True if sub is None else sub  # True if sub is None means it's the first time
+    }
     
     s3.put_object(Bucket=BUCKET_NAME, Key=FILE_KEY, Body=json.dumps(data))
+    
 
 # Comment decorator for local testing
 @verify_key_decorator(DISCORD_PUBLIC_KEY)
 def interact(raw_request):
     if raw_request["type"] == 1:
        return jsonify({"type": 1})
-       
-    update_channels(raw_request["channel"])
 
     data = raw_request["data"]
     command_name = data["name"]
     message_content = "I don't understand this command, try again!"
+    
+    update_channels(raw_request)
     
     if command_name == "hello":
         message_content = "Hello there!"
@@ -68,11 +86,11 @@ def interact(raw_request):
         tag = data["options"][0]
         if tag["name"] == 'location':
             location = tag["options"][0]["value"]
-            content = "Here is the schedule for the requested Grand Prix weekend:"
+            content = "Here is the schedule for the requested Grand Prix weekend!"
         elif tag["name"] == 'next':
             # da pra buscar isso uma vez só de tempos em tempos e guardar em algum lugar
             location = next_gp(SCHEDULE_PATH)[0]
-            content = "Here is the schedule for the next Grand Prix weekend:"
+            content = "Here is the schedule for the next Grand Prix weekend!"
             
         embed = generate_schedule_embed(SCHEDULE_PATH, location)
         

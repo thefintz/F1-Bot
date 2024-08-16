@@ -6,12 +6,12 @@ import requests
 from utils import get_schedules, generate_schedule_embed
 
 # Uncomment for local testing
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 # Change for local testing
-# SCHEDULE_PATH = "../data/schedule"
-SCHEDULE_PATH = "data/schedule"
+SCHEDULE_PATH = "../data/schedule"
+# SCHEDULE_PATH = "data/schedule"
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 
@@ -44,7 +44,8 @@ def next_gp():
 def send_next_gp_message():
     response = s3.get_object(Bucket=BUCKET_NAME, Key=FILE_KEY)
     guilds = json.loads(response['Body'].read())
-    channels = guilds.values()
+    print(f"Guilds: {guilds}")
+    channels = [item['channel_id'] for item in guilds.values()]
     
     location, is_race_week = next_gp()
     embed = generate_schedule_embed(SCHEDULE_PATH, location)

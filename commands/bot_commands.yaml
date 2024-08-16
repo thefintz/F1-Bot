@@ -10,6 +10,12 @@
 - name: winner
   description: Who won the last F1 race?
   
+- name: subscribe
+  description: Subscribe to weekly Grand Prix reminder.
+  
+- name: unsubscribe
+  description: Unsubscribe from weekly Grand Prix reminder.
+  
 - name: gp
   description: Information about current season Grand Prix weekends.
   options:
