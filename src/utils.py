@@ -125,4 +125,3 @@ def generate_schedule_embed(schedule_path, location):
             }
         ]
     }
-get_driver_standing()
