@@ -92,14 +92,14 @@ def interact(raw_request):
             content = "Here are the current driver standings!"
             embed = {
                 "title": "Driver Standings",
-                "url": f"https://www.formula1.com/en/results.html/{datetime.date.today()}/drivers.html",
+                "url": f"https://www.formula1.com/en/results/{datetime.date.today()}/drivers.html",
                 "color": 16711680
             }
         elif tag["name"] == 'constructors':
             content = "Here are the current constructor standings!"
             embed = {
                 "title": "Constructor Standings",
-                "url": f"https://www.formula1.com/en/results.html/{datetime.date.today()}/team.html",
+                "url": f"https://www.formula1.com/en/results/{datetime.date.today()}/team.html",
                 "color": 16711680
             }
             
