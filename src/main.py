@@ -6,7 +6,7 @@ from discord_interactions import verify_key_decorator
 import json
 import datetime
 import boto3
-from src.utils import generate_schedule_embed, next_gp, formatted_driver_standings
+from src.utils import generate_schedule_embed, next_gp, formatted_driver_standings, formatted_constructor_standings
 
 # Uncomment for local testing
 # from dotenv import load_dotenv
@@ -100,11 +100,14 @@ def interact(raw_request):
             }
 
         elif tag["name"] == 'constructors':
+            standings = formatted_constructor_standings()
+            
             content = "Here are the current constructor standings!"
             embed = {
                 "title": "Constructor Standings",
                 "url": f"https://www.formula1.com/en/results/{datetime.date.today()}/team.html",
-                "color": 16711680
+                "color": 16711680,
+                "fields": standings,
             }
             
         response_data = {

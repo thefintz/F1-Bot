@@ -38,6 +38,30 @@ def formatted_driver_standings():
         
     print(formatted_standings)
     return formatted_standings
+    
+def get_constructor_standings():
+    response = requests.get("http://ergast.com/api/f1/current/constructorStandings.json")
+    # print(response.json()['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings'])
+    return response.json()['MRData']['StandingsTable']['StandingsLists'][0]['ConstructorStandings']
+    
+def formatted_constructor_standings():
+    standings = get_constructor_standings()
+    
+    formatted_standings = []
+    for constructor in standings:
+        constructor_name = constructor['Constructor']['name']
+        points = constructor['points']
+        wins = constructor['wins']
+        position = constructor['position']
+        
+        formatted_standings.append({
+            "name": f"{position}. {constructor_name}",
+            "value": f"Points: {points}\nWins: {wins}",
+            "inline": False
+        })
+        
+    print(formatted_standings)
+    return formatted_standings
 
 def format_datetime(datetime_str):
     dt = datetime.datetime.fromisoformat(datetime_str.replace("Z", "+00:00"))
