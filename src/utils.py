@@ -14,10 +14,30 @@ def get_gp_schedule(path, year, name):
     
     return {"error": "No schedule found for this GP!"}
     
-def get_driver_standing():
+def get_driver_standings():
     response = requests.get("https://ergast.com/api/f1/current/driverStandings.json")
-    print(response.status_code)
-    print(response.json())
+    # print(response.json()['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'])
+    return response.json()['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings']
+    
+def formatted_driver_standings():
+    standings = get_driver_standings()
+    
+    formatted_standings = []
+    for driver in standings:
+        driver_name = f"{driver['Driver']['givenName']} {driver['Driver']['familyName']}"
+        constructor_name = driver['Constructors'][0]['name']
+        points = driver['points']
+        wins = driver['wins']
+        position = driver['position']
+        
+        formatted_standings.append({
+            "name": f"{position}. {driver_name} ({constructor_name})",
+            "value": f"Points: {points}\nWins: {wins}",
+            "inline": False
+        })
+        
+    print(formatted_standings)
+    return formatted_standings
 
 def format_datetime(datetime_str):
     dt = datetime.datetime.fromisoformat(datetime_str.replace("Z", "+00:00"))

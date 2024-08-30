@@ -6,7 +6,7 @@ from discord_interactions import verify_key_decorator
 import json
 import datetime
 import boto3
-from src.utils import generate_schedule_embed, next_gp
+from src.utils import generate_schedule_embed, next_gp, formatted_driver_standings
 
 # Uncomment for local testing
 # from dotenv import load_dotenv
@@ -89,12 +89,16 @@ def interact(raw_request):
     elif command_name == "standings":
         tag = data["options"][0]
         if tag["name"] == 'drivers':
+            standings = formatted_driver_standings()
+            
             content = "Here are the current driver standings!"
             embed = {
                 "title": "Driver Standings",
                 "url": f"https://www.formula1.com/en/results/{datetime.date.today()}/drivers.html",
-                "color": 16711680
+                "color": 16711680,
+                "fields": standings,
             }
+
         elif tag["name"] == 'constructors':
             content = "Here are the current constructor standings!"
             embed = {
