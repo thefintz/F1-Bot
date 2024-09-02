@@ -16,11 +16,21 @@ def get_gp_schedule(path, year, name):
     
 def get_driver_standings():
     response = requests.get("https://ergast.com/api/f1/current/driverStandings.json")
+    
+    if response.status_code != 200:
+        return {"error": {
+            "name": "API Error",
+            "value": "Could not fetch driver standings!",
+            "inline": False
+        }}
     # print(response.json()['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings'])
     return response.json()['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings']
     
 def formatted_driver_standings():
     standings = get_driver_standings()
+    
+    if 'error' in standings:
+        return [standings]
     
     formatted_standings = []
     for driver in standings:
@@ -36,7 +46,6 @@ def formatted_driver_standings():
             "inline": False
         })
         
-    print(formatted_standings)
     return formatted_standings
     
 def get_constructor_standings():
