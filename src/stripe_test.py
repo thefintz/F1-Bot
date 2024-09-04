@@ -1,9 +1,9 @@
 import os
 import stripe
 
-stripe.api_key = os.getenv("STRIPE_API_KEY")
-
 def generate_payment_link():
+    stripe.api_key = os.getenv("STRIPE_API_KEY")
+    
     starter_subscription = stripe.Product.create(
         name="F1 Ticket",
         # description="$5/Month subscription",
