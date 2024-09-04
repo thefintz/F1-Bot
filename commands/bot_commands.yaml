@@ -16,6 +16,9 @@
 - name: unsubscribe
   description: Unsubscribe from weekly Grand Prix reminder.
   
+- name: ticket
+  description: Get ticket for the next Grand Prix (Stripe Test).
+  
 - name: standings
   description: Show championship standings.
   options:

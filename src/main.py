@@ -7,6 +7,7 @@ import json
 import datetime
 import boto3
 from src.utils import generate_schedule_embed, next_gp, formatted_driver_standings, formatted_constructor_standings
+from src.stripe_test import generate_payment_link
 
 # Uncomment for local testing
 # from dotenv import load_dotenv
@@ -21,6 +22,8 @@ DISCORD_PUBLIC_KEY = os.getenv("DISCORD_PUBLIC_KEY")
 s3 = boto3.client("s3")
 BUCKET_NAME = 'f1-bot-channels'
 FILE_KEY = 'guild_channel.json'
+
+link_cache = {}
 
 app = Flask(__name__)
 asgi_app = WsgiToAsgi(app)
@@ -56,10 +59,15 @@ def update_channels(raw_request):
     data[chat_id] = {
         "channel_id": channel_id,
         "channel_type": channel_type,
-        "sub": True if sub is None else sub  # True if sub is None means it's the first time
+        "sub": True if sub is None else sub,  # True if sub is None means it's the first time
+        "payment_link": generate_payment_link() if data.get("payment_link") is None else data["payment_link"]
     }
     
+    link_cache[chat_id] = data[chat_id]["payment_link"]
+    
     s3.put_object(Bucket=BUCKET_NAME, Key=FILE_KEY, Body=json.dumps(data))
+    
+    return data, chat_id, data[chat_id]["payment_link"]
     
 
 # Comment decorator for local testing
@@ -72,7 +80,7 @@ def interact(raw_request):
     command_name = data["name"]
     message_content = "I don't understand this command, try again!"
     
-    update_channels(raw_request)
+    s3_data, chat_id, payment_link = update_channels(raw_request)
     
     if command_name == "hello":
         message_content = "Hello there!"
@@ -86,6 +94,8 @@ def interact(raw_request):
         message_content = "You are now subscribed to the Grand Prix schedule updates!"
     elif command_name == "unsubscribe":
         message_content = "You are now unsubscribed from the Grand Prix schedule updates!"
+    elif command_name == "ticket":
+        message_content = f"Here is the link to buy your F1 ticket:\n{payment_link}"
     elif command_name == "standings":
         tag = data["options"][0]
         if tag["name"] == 'drivers':
