@@ -28,6 +28,7 @@ functions:
     timeout: 10
     environment:
       DISCORD_PUBLIC_KEY: ${env:DISCORD_PUBLIC_KEY}
+      STRIPE_API_KEY: ${env:STRIPE_API_KEY}
     package:
       exclude:
         - "!node_modules/**"
