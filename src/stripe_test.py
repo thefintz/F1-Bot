@@ -1,7 +1,7 @@
 import os
 import stripe
 
-def generate_payment_link():
+def generate_payment_link(user_id):
     stripe.api_key = os.getenv("STRIPE_API_KEY")
     
     starter_subscription = stripe.Product.create(
@@ -16,6 +16,9 @@ def generate_payment_link():
         product=starter_subscription['id'],
     )
     
-    link = stripe.PaymentLink.create(line_items=[{"price": starter_subscription_price['id'], "quantity": 1}])
+    link = stripe.PaymentLink.create(
+        line_items=[{"price": starter_subscription_price['id'], "quantity": 1}],
+        metadata={"user_id": user_id},
+    )
 
     return link.url

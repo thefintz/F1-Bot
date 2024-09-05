@@ -21,9 +21,6 @@ DISCORD_PUBLIC_KEY = os.getenv("DISCORD_PUBLIC_KEY")
 
 s3 = boto3.client("s3")
 BUCKET_NAME = 'f1-bot-channels'
-FILE_KEY = 'guild_channel.json'
-
-link_cache = {}
 
 app = Flask(__name__)
 asgi_app = WsgiToAsgi(app)
@@ -44,7 +41,7 @@ def update_channels(raw_request):
         chat_id = channel["recipients"][0]["id"]
         channel_type = "dm"
     
-    response = s3.get_object(Bucket=BUCKET_NAME, Key=FILE_KEY)
+    response = s3.get_object(Bucket=BUCKET_NAME, Key='guild_channel.json')
     data = json.loads(response['Body'].read())
     
     # Check if the command is subscribe or unsubscribe
@@ -60,15 +57,30 @@ def update_channels(raw_request):
         "channel_id": channel_id,
         "channel_type": channel_type,
         "sub": True if sub is None else sub,  # True if sub is None means it's the first time
-        "payment_link": generate_payment_link() if data.get("payment_link") is None else data["payment_link"]
     }
     
-    link_cache[chat_id] = data[chat_id]["payment_link"]
+    s3.put_object(Bucket=BUCKET_NAME, Key='guild_channel.json', Body=json.dumps(data))
     
-    s3.put_object(Bucket=BUCKET_NAME, Key=FILE_KEY, Body=json.dumps(data))
+def get_payment(raw_request):
+    user_id = raw_request['user']['id']
     
-    return data, chat_id, data[chat_id]["payment_link"]
+    response = s3.get_object(Bucket=BUCKET_NAME, Key='user_payments.json')
+    data = json.loads(response['Body'].read())
     
+    # Gerar link se não existir e adicionar ao dicionário com a chave do id do usuário
+    # mudar a função do stripe que gera o link para passar junto o id do usuário como metadata
+    # para notificar o usuário que fez a compra
+    
+    payment_link = data.get(user_id, {}).get("payment_link")
+    payment_link = generate_payment_link(user_id) if payment_link is None else payment_link
+    
+    data[user_id] = {
+        "payment_link": payment_link,
+    }
+    
+    s3.put_object(Bucket=BUCKET_NAME, Key='user_payments.json', Body=json.dumps(data))
+    
+    return payment_link
 
 # Comment decorator for local testing
 @verify_key_decorator(DISCORD_PUBLIC_KEY)
@@ -80,7 +92,7 @@ def interact(raw_request):
     command_name = data["name"]
     message_content = "I don't understand this command, try again!"
     
-    s3_data, chat_id, payment_link = update_channels(raw_request)
+    update_channels(raw_request)
     
     if command_name == "hello":
         message_content = "Hello there!"
@@ -95,6 +107,7 @@ def interact(raw_request):
     elif command_name == "unsubscribe":
         message_content = "You are now unsubscribed from the Grand Prix schedule updates!"
     elif command_name == "ticket":
+        payment_link = get_payment(raw_request)
         message_content = f"Here is the link to buy your F1 ticket:\n{payment_link}"
     elif command_name == "standings":
         tag = data["options"][0]
