@@ -7,7 +7,7 @@ import json
 import datetime
 import boto3
 from src.utils import generate_schedule_embed, next_gp, formatted_driver_standings, formatted_constructor_standings
-from src.stripe_test import generate_payment_link
+from src.stripe_payment import generate_payment_link
 
 # Uncomment for local testing
 # from dotenv import load_dotenv
@@ -70,8 +70,11 @@ def get_payment(raw_request):
     payment_link = data.get(user_id, {}).get("payment_link")
     payment_link = generate_payment_link(user_id) if payment_link is None else payment_link
     
+    sub = data.get(user_id, {}).get("sub")
+    
     data[user_id] = {
         "payment_link": payment_link,
+        "sub": False if sub is None else sub,
     }
     
     s3.put_object(Bucket=BUCKET_NAME, Key='user_payments.json', Body=json.dumps(data))
