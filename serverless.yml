@@ -35,3 +35,19 @@ functions:
         - "yarn.lock"
         - "!package-lock.json"
         - "!package.json"
+  stripe:
+    name: f1-bot-stripe-webhook
+    handler: src/stripe_payment.app
+    description: Stripe webhook for F1 Bot
+    memorySize: 128
+    timeout: 10
+    environment:
+      DISCORD_TOKEN: ${env:DISCORD_TOKEN}
+      STRIPE_API_KEY: ${env:STRIPE_API_KEY}
+      STRIPE_WEBHOOK_SECRET: ${env:STRIPE_WEBHOOK_SECRET}
+    package:
+      exclude:
+        - "!node_modules/**"
+        - "yarn.lock"
+        - "!package-lock.json"
+        - "!package.json"
