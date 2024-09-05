@@ -62,14 +62,10 @@ def update_channels(raw_request):
     s3.put_object(Bucket=BUCKET_NAME, Key='guild_channel.json', Body=json.dumps(data))
     
 def get_payment(raw_request):
-    user_id = raw_request['user']['id']
+    user_id = raw_request['member']['user']['id'] if 'guild' in raw_request else raw_request['user']['id']
     
     response = s3.get_object(Bucket=BUCKET_NAME, Key='user_payments.json')
     data = json.loads(response['Body'].read())
-    
-    # Gerar link se não existir e adicionar ao dicionário com a chave do id do usuário
-    # mudar a função do stripe que gera o link para passar junto o id do usuário como metadata
-    # para notificar o usuário que fez a compra
     
     payment_link = data.get(user_id, {}).get("payment_link")
     payment_link = generate_payment_link(user_id) if payment_link is None else payment_link
