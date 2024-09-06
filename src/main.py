@@ -69,11 +69,8 @@ def get_payment(user_id):
     payment_link = data.get(user_id, {}).get("payment_link")
     payment_link = generate_payment_link(user_id) if payment_link is None else payment_link
     
-    sub = data.get(user_id, {}).get("sub")
-    
     data[user_id] = {
         "payment_link": payment_link,
-        "sub": False if sub is None else sub,
     }
     
     s3.put_object(Bucket=BUCKET_NAME, Key='user_payments.json', Body=json.dumps(data))

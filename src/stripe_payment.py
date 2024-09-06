@@ -6,8 +6,8 @@ import requests
 from flask import Flask, jsonify, request
 
 # Uncomment for local testing
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 stripe.api_key = os.getenv("STRIPE_API_KEY")
 webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
@@ -20,20 +20,26 @@ app = Flask(__name__)
 
 @app.route("/webhook", methods=["POST"])
 def stripe_webhook():
+    event = None
     payload = request.data
-    sig_header = request.headers.get('Stripe-Signature')
-
     try:
-        # Verifica a autenticidade do evento enviado pelo Stripe
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, webhook_secret
-        )
-    except ValueError as e:
-        return jsonify({'error': str(e)}), 400
-    except stripe.error.SignatureVerificationError as e:
-        return jsonify({'error': 'Invalid signature'}), 400
+        event = json.loads(payload)
+    except json.decoder.JSONDecodeError as e:
+        print('⚠️  Webhook error while parsing basic request.' + str(e))
+        return jsonify(success=False)
+    # sig_header = request.headers.get('Stripe-Signature')
 
-    update_payment_status(event)
+    # try:
+    #     # Verifica a autenticidade do evento enviado pelo Stripe
+    #     event = stripe.Webhook.construct_event(
+    #         payload, sig_header, webhook_secret
+    #     )
+    # except ValueError as e:
+    #     return jsonify({'error': str(e)}), 400
+    # except stripe.error.SignatureVerificationError as e:
+    #     return jsonify({'error': 'Invalid signature'}), 400
+    if event:
+        update_payment_status(event)
 
     return jsonify({'status': 'success'}), 200
 
@@ -93,17 +99,22 @@ def update_payment_status(event):
     user_id = payment_intent['metadata']['user_id']  # Obtém o ID do usuário do Discord
 
     if (event['type'] == 'payment_intent.succeeded'):
-        data[user_id]['sub'] = True
         dm_message(user_id)
 
     s3.put_object(Bucket=BUCKET_NAME, Key='guild_channel.json', Body=json.dumps(data))
 
 def check_payment_status(user_id):
-    # Buscar todas as sessões de pagamento associadas ao user_id nos metadados
-    payment_intents = stripe.PaymentIntent.list(limit=100)
+    sessions = stripe.checkout.Session.list(limit=100)
+    print(len(sessions.data))
+
+    for session in sessions.data:
+        # Verifica se a sessão contém metadados com o user_id
+        if session.metadata.get('user_id') == user_id:
+            # Verifica o status do pagamento
+            if session.payment_status == 'paid':
+                print(f"Pagamento encontrado e bem-sucedido para o user_id: {user_id}")
+                return True
     
-    for intent in payment_intents.data:
-        if intent.metadata.get('user_id') == user_id and intent.status == 'succeeded':
-            return True  # Pagamento encontrado e bem-sucedido
-    
-    return False  # Nenhum pagamento bem-sucedido encontrado
+    # Se não encontrar nenhum pagamento associado ao user_id
+    print(f"Nenhum pagamento encontrado para o user_id: {user_id}")
+    return False
