@@ -61,29 +61,6 @@ def update_channels(raw_request):
     }
     
     s3.put_object(Bucket=BUCKET_NAME, Key='guild_channel.json', Body=json.dumps(data))
-    
-def get_payment(user_id):    
-    response = s3.get_object(Bucket=BUCKET_NAME, Key='user_payments.json')
-    data = json.loads(response['Body'].read())
-    
-    payment_link = data.get(user_id, {}).get("payment_link")
-    payment_link = generate_payment_link(user_id) if payment_link is None else payment_link
-    
-    data[user_id] = {
-        "payment_link": payment_link,
-    }
-    
-    s3.put_object(Bucket=BUCKET_NAME, Key='user_payments.json', Body=json.dumps(data))
-    
-    return payment_link
-
-# def save_user_name(user_id, user_name):
-#     response = s3.get_object(Bucket=BUCKET_NAME, Key='user_payments.json')
-#     data = json.loads(response['Body'].read())
-    
-#     data[user_id]['name'] = user_name
-    
-#     s3.put_object(Bucket=BUCKET_NAME, Key='user_payments.json', Body=json.dumps(data))
 
 # Comment decorator for local testing
 @verify_key_decorator(DISCORD_PUBLIC_KEY)
@@ -113,7 +90,7 @@ def interact(raw_request):
     elif command_name == "unsubscribe":
         message_content = "You are now unsubscribed from the Grand Prix schedule updates!"
     elif command_name == "ticket":
-        payment_link = get_payment(user_id)
+        payment_link = generate_payment_link(user_id)
         message_content = f"Here is the link to buy your F1 ticket:\n{payment_link}"
     elif command_name == "race":
         if check_payment_status(user_id):

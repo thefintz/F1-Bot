@@ -43,8 +43,22 @@ def stripe_webhook():
 
     return jsonify({'status': 'success'}), 200
 
+def search_payment_link(user_id):
+    payment_links = stripe.PaymentLink.list(limit=100)
+    
+    # Percorrer todos os links e verificar os metadados
+    for link in payment_links.data:
+        if link.metadata.get('user_id') == user_id:
+            return link.url
+
+    return None
+
 def generate_payment_link(user_id):
     stripe.api_key = os.getenv("STRIPE_API_KEY")
+    
+    existing_link = search_payment_link(user_id)
+    if existing_link:
+        return existing_link
 
     starter_subscription = stripe.Product.create(
         name="F1 Ticket",
