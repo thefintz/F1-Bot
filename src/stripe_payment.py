@@ -97,3 +97,13 @@ def update_payment_status(event):
         dm_message(user_id)
 
     s3.put_object(Bucket=BUCKET_NAME, Key='guild_channel.json', Body=json.dumps(data))
+
+def check_payment_status(user_id):
+    # Buscar todas as sessões de pagamento associadas ao user_id nos metadados
+    payment_intents = stripe.PaymentIntent.list(limit=100)
+    
+    for intent in payment_intents.data:
+        if intent.metadata.get('user_id') == user_id and intent.status == 'succeeded':
+            return True  # Pagamento encontrado e bem-sucedido
+    
+    return False  # Nenhum pagamento bem-sucedido encontrado

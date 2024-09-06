@@ -19,6 +19,9 @@
 - name: ticket
   description: Get ticket for the next Grand Prix (Stripe Test).
   
+- name: race
+  description: Join the race if you bought a ticket.
+  
 - name: standings
   description: Show championship standings.
   options:

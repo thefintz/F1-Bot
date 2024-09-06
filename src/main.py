@@ -6,8 +6,9 @@ from discord_interactions import verify_key_decorator
 import json
 import datetime
 import boto3
+from stripe import checkout
 from src.utils import generate_schedule_embed, next_gp, formatted_driver_standings, formatted_constructor_standings
-from src.stripe_payment import generate_payment_link
+from src.stripe_payment import generate_payment_link, check_payment_status
 
 # Uncomment for local testing
 # from dotenv import load_dotenv
@@ -117,6 +118,11 @@ def interact(raw_request):
     elif command_name == "ticket":
         payment_link = get_payment(user_id)
         message_content = f"Here is the link to buy your F1 ticket:\n{payment_link}"
+    elif command_name == "race":
+        if check_payment_status(user_id):
+            message_content = "Welcome to the race, thank you for buying your ticket!"
+        else:
+            message_content = "You need to buy a ticket to access the race! Type /ticket to get the payment link."
     elif command_name == "standings":
         tag = data["options"][0]
         if tag["name"] == 'drivers':
