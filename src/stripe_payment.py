@@ -6,8 +6,8 @@ import requests
 from flask import Flask, jsonify, request
 
 # Uncomment for local testing
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
 stripe.api_key = os.getenv("STRIPE_API_KEY")
 webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
