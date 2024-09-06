@@ -20,21 +20,20 @@ app = Flask(__name__)
 
 @app.route("/webhook", methods=["POST"])
 def stripe_webhook():
-    payload = request.data
-    sig_header = request.headers.get('Stripe-Signature')
+    # payload = request.data
+    # sig_header = request.headers.get('Stripe-Signature')
 
-    try:
-        # Verifica a autenticidade do evento enviado pelo Stripe
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, webhook_secret
-        )
-    except ValueError as e:
-        return jsonify({'error': str(e)}), 400
-    except stripe.error.SignatureVerificationError as e:
-        return jsonify({'error': 'Invalid signature'}), 400
+    # try:
+    #     # Verifica a autenticidade do evento enviado pelo Stripe
+    #     event = stripe.Webhook.construct_event(
+    #         payload, sig_header, webhook_secret
+    #     )
+    # except ValueError as e:
+    #     return jsonify({'error': str(e)}), 400
+    # except stripe.error.SignatureVerificationError as e:
+    #     return jsonify({'error': 'Invalid signature'}), 400
 
-        
-    update_payment_status(event)
+    # update_payment_status(event)
 
     return jsonify({'status': 'success'}), 200
 
@@ -93,10 +92,7 @@ def update_payment_status(event):
     payment_intent = event['data']['object']
     user_id = payment_intent['metadata']['user_id']  # Obtém o ID do usuário do Discord
     
-    if (
-      event['type'] == 'checkout.session.completed'
-      or event['type'] == 'checkout.session.async_payment_succeeded'
-      ):
+    if (event['type'] == 'payment_intent.succeeded'):
         data[user_id]['sub'] = True
         dm_message(user_id)
     

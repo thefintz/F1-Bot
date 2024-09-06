@@ -61,9 +61,7 @@ def update_channels(raw_request):
     
     s3.put_object(Bucket=BUCKET_NAME, Key='guild_channel.json', Body=json.dumps(data))
     
-def get_payment(raw_request):
-    user_id = raw_request['member']['user']['id'] if 'guild' in raw_request else raw_request['user']['id']
-    
+def get_payment(user_id):    
     response = s3.get_object(Bucket=BUCKET_NAME, Key='user_payments.json')
     data = json.loads(response['Body'].read())
     
@@ -81,6 +79,14 @@ def get_payment(raw_request):
     
     return payment_link
 
+# def save_user_name(user_id, user_name):
+#     response = s3.get_object(Bucket=BUCKET_NAME, Key='user_payments.json')
+#     data = json.loads(response['Body'].read())
+    
+#     data[user_id]['name'] = user_name
+    
+#     s3.put_object(Bucket=BUCKET_NAME, Key='user_payments.json', Body=json.dumps(data))
+
 # Comment decorator for local testing
 @verify_key_decorator(DISCORD_PUBLIC_KEY)
 def interact(raw_request):
@@ -89,8 +95,11 @@ def interact(raw_request):
 
     data = raw_request["data"]
     command_name = data["name"]
+    user_id = raw_request['member']['user']['id'] if 'guild' in raw_request else raw_request['user']['id']
+    user_name = raw_request['member']['user']['global_name'] if 'guild' in raw_request else raw_request['user']['global_name']
     message_content = "I don't understand this command, try again!"
     
+    # save_user_name(user_id, user_name)
     update_channels(raw_request)
     
     if command_name == "hello":
@@ -106,7 +115,7 @@ def interact(raw_request):
     elif command_name == "unsubscribe":
         message_content = "You are now unsubscribed from the Grand Prix schedule updates!"
     elif command_name == "ticket":
-        payment_link = get_payment(raw_request)
+        payment_link = get_payment(user_id)
         message_content = f"Here is the link to buy your F1 ticket:\n{payment_link}"
     elif command_name == "standings":
         tag = data["options"][0]
