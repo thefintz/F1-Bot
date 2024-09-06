@@ -20,80 +20,80 @@ app = Flask(__name__)
 
 @app.route("/webhook", methods=["POST"])
 def stripe_webhook():
-    # payload = request.data
-    # sig_header = request.headers.get('Stripe-Signature')
+    payload = request.data
+    sig_header = request.headers.get('Stripe-Signature')
 
-    # try:
-    #     # Verifica a autenticidade do evento enviado pelo Stripe
-    #     event = stripe.Webhook.construct_event(
-    #         payload, sig_header, webhook_secret
-    #     )
-    # except ValueError as e:
-    #     return jsonify({'error': str(e)}), 400
-    # except stripe.error.SignatureVerificationError as e:
-    #     return jsonify({'error': 'Invalid signature'}), 400
+    try:
+        # Verifica a autenticidade do evento enviado pelo Stripe
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, webhook_secret
+        )
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except stripe.error.SignatureVerificationError as e:
+        return jsonify({'error': 'Invalid signature'}), 400
 
-    # update_payment_status(event)
+    update_payment_status(event)
 
     return jsonify({'status': 'success'}), 200
 
 def generate_payment_link(user_id):
     stripe.api_key = os.getenv("STRIPE_API_KEY")
-    
+
     starter_subscription = stripe.Product.create(
         name="F1 Ticket",
         # description="$5/Month subscription",
     )
-    
+
     starter_subscription_price = stripe.Price.create(
         unit_amount=2000,
         currency="usd",
         # recurring={"interval": "month"},
         product=starter_subscription['id'],
     )
-    
+
     link = stripe.PaymentLink.create(
         line_items=[{"price": starter_subscription_price['id'], "quantity": 1}],
         metadata={"user_id": user_id},
     )
 
     return link.url
-    
+
 def dm_message(user_id):
     headers = {
         'Authorization': f'Bot {discord_token}',
         'Content-Type': 'application/json'
     }
-    
+
     # DM channel creation
     dm_url = 'https://discord.com/api/v9/users/@me/channels'
     dm_data = {
         'recipient_id': user_id
     }
     response = requests.post(dm_url, headers=headers, json=dm_data)
-    
+
     if response.status_code == 200:
         dm_channel_id = response.json()['id']
         content = "Your payment has been successfully processed! Thanks for buying the ticket!"
-        
+
         # Send the message to the DM channel created
         message_url = f'https://discord.com/api/v10/channels/{dm_channel_id}/messages'
         message_data = {
             "type": 4,
             "content": content,
         }
-        
+
         message_response = requests.post(message_url, headers=headers, json=message_data)
-    
+
 def update_payment_status(event):
     response = s3.get_object(Bucket=BUCKET_NAME, Key='guild_channel.json')
     data = json.loads(response['Body'].read())
-    
+
     payment_intent = event['data']['object']
     user_id = payment_intent['metadata']['user_id']  # Obtém o ID do usuário do Discord
-    
+
     if (event['type'] == 'payment_intent.succeeded'):
         data[user_id]['sub'] = True
         dm_message(user_id)
-    
+
     s3.put_object(Bucket=BUCKET_NAME, Key='guild_channel.json', Body=json.dumps(data))
